@@ -9,4 +9,5 @@
 *.pem
 
 # Ansible
+ansible/inventory.ini
 *.retry
