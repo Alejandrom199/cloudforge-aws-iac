@@ -1,0 +1,51 @@
+---
+- name: Configurar servidor CloudForge
+  hosts: cloudforge
+  become: true
+
+  tasks:
+    - name: Actualizar cache de paquetes
+      ansible.builtin.dnf:
+        update_cache: true
+
+    - name: Instalar Docker
+      ansible.builtin.dnf:
+        name: docker
+        state: present
+
+    - name: Arrancar y habilitar Docker
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Agregar ec2-user al grupo docker
+      ansible.builtin.user:
+        name: ec2-user
+        groups: docker
+        append: true
+
+    - name: Crear pagina web de la aplicacion
+      ansible.builtin.copy:
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head><title>CloudForge</title></head>
+          <body style="font-family: sans-serif; text-align: center; padding: 50px;">
+            <h1>CloudForge esta vivo</h1>
+            <p>Infraestructura creada con Terraform.</p>
+            <p>Servidor configurado con Ansible.</p>
+            <p>Aplicacion corriendo en Docker.</p>
+          </body>
+          </html>
+        dest: /tmp/index.html
+
+    - name: Ejecutar contenedor nginx con la pagina
+      ansible.builtin.shell: |
+        docker rm -f cloudforge-web 2>/dev/null || true
+        docker run -d --name cloudforge-web \
+          -p 80:80 \
+          -v /tmp/index.html:/usr/share/nginx/html/index.html:ro \
+          nginx:alpine
+      args:
+        executable: /bin/bash
