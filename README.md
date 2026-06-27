@@ -29,6 +29,7 @@ Usuario → Accede desde navegador
 
 ## Estructura del proyecto
 
+```text
 cloudforge/
 ├── README.md
 ├── .gitignore
@@ -43,6 +44,7 @@ cloudforge/
 └── ansible/
     ├── inventory.ini
     └── playbook.yml
+```
 
 ---
 
